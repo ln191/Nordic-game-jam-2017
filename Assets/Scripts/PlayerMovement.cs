@@ -15,8 +15,50 @@ public class PlayerMovement : MonoBehaviour
     private float timer;
     public bool automaticSpacing;
     private List<GameObject> players = new List<GameObject>();
+    public bool allowMovement = false;
+    private Vector3 startPos;
+    private GameObject bed;
 
     private bool inBed, keyDown, keyTest;
+
+    public bool InBed
+    {
+        get
+        {
+            return inBed;
+        }
+
+        set
+        {
+            inBed = value;
+        }
+    }
+
+    public int Health
+    {
+        get
+        {
+            return health;
+        }
+
+        set
+        {
+            health = value;
+        }
+    }
+
+    public GameObject Bed
+    {
+        get
+        {
+            return bed;
+        }
+
+        set
+        {
+            bed = value;
+        }
+    }
 
     // Use this for initialization
     void Start()
@@ -26,15 +68,10 @@ public class PlayerMovement : MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
 
-        if (automaticSpacing)
-        {
-            rb.position = new Vector3(startPosX * playerNumber, 1, startPosY);
-        }
+        startPos = transform.position;
+        //rb.position = new Vector3(startPosX * playerNumber, 1, startPosY);
 
-        else
-        {
-            rb.position = new Vector3(startPosX, 1, startPosY);
-        }
+
 
         for (int i = 1; i < 5; i++)
         {
@@ -51,7 +88,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Input.GetAxis("Fire" + playerNumber) == 0)
+        if (Input.GetAxisRaw("Fire" + playerNumber) == 0 && allowMovement)
         {
             keyDown = false;
         }
@@ -81,7 +118,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //as long as player has health, he can move
-        if (health > 0 && !inBed)
+        if (health > 0 && !inBed && allowMovement)
         {
             //    velocity = new Vector3(Input.GetAxisRaw("Horizontal" + playerNumber), 0, Input.GetAxisRaw("Vertical" + playerNumber));
             //    //velocity.x = Input.GetAxis("Horizontal" + playerNumber);
@@ -132,6 +169,9 @@ public class PlayerMovement : MonoBehaviour
                 transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y, 0));
                 other.GetComponent<Bed>().isOccupied = true;
                 keyDown = true;
+
+                bed = other.gameObject;
+
                
             }
 

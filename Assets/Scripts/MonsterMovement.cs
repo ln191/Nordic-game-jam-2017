@@ -8,14 +8,12 @@ public class MonsterMovement : MonoBehaviour
 {
     //Get this from world (beds)
     private int offsetX, offsetZ;
-    private int bedLength = 2, bedHeight = 4;
-    private TestBed[,] testBeds;
+    private GameObject[,] testBeds;
     public float speed;
-    public List<TestBed> beds = new List<TestBed>();
-    public TestBed targetBed;
-    private int destinationX = 1, destinationZ = 0;
+    private GameObject targetBed;
+    private int destinationX = 2, destinationZ = 2;
     public int amountOfWaypoints;
-    private int amountOfBedsX = 2, amountOfBedsZ = 2;
+    private int amountOfBedsX = 3, amountOfBedsZ = 4;
     private bool isBedFound = false;
     int axis;
 
@@ -29,16 +27,7 @@ public class MonsterMovement : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        testBeds = new TestBed[amountOfBedsX, amountOfBedsZ];
-        for (int i = 0; i < testBeds.GetLength(1); i++)
-        {
-            for (int o = 0; o < testBeds.GetLength(0); o++)
-            {
-                testBeds[o, i] = beds[index];
-                index++;
-
-            }
-        }
+        testBeds = GameObject.Find("GameStuff").GetComponent<Shuffle>().Bedplacements;
 
 
         if (amountOfBedsX > 1)
@@ -104,10 +93,10 @@ public class MonsterMovement : MonoBehaviour
 
         if (amountOfWaypoints == 0 && !isBedFound)
         {
-            List<TestBed> bedsInRange = new List<TestBed>();
-            foreach (TestBed bed in beds)
+            List<GameObject> bedsInRange = new List<GameObject>();
+            foreach (GameObject bed in testBeds)
             {
-                if ((bed.transform.position - transform.position).magnitude < 15 && !bed.Occupied)
+                if ((bed.transform.position - transform.position).magnitude < 15 && !bed.GetComponent<Bed>().isMonsterOccupied)
                 {
                     bedsInRange.Add(bed);
                     
@@ -116,6 +105,8 @@ public class MonsterMovement : MonoBehaviour
             if (bedsInRange.Count != 0)
             {
                 targetBed = bedsInRange[Random.Range(0, bedsInRange.Count)];
+                targetBed.GetComponent<Bed>().isMonsterOccupied = true;
+                GameObject.Find("GameStuff").GetComponent<GameManager>().monsterPlaced++;
                 isBedFound = true;
             }
             else

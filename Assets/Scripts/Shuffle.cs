@@ -321,7 +321,7 @@ public class Shuffle : MonoBehaviour
         {
             for (int x = 0; x < bedWidth; x++)
             {
-                bedplacements[z, x].transform.position = new Vector3(Mathf.Lerp(bedplacements[z, x].transform.position.x, x * spaceBetweenBed, 0.05f), 0.5f, Mathf.Lerp(bedplacements[z, x].transform.position.z, z * spaceBetweenBed, 0.05f));
+                bedplacements[z, x].transform.position = new Vector3(Mathf.Lerp(bedplacements[z, x].transform.position.x, x * spaceBetweenBed-12, 0.05f), 0.5f, Mathf.Lerp(bedplacements[z, x].transform.position.z, z * spaceBetweenBed-8, 0.05f));
             }
         }
     }
@@ -337,7 +337,7 @@ public class Shuffle : MonoBehaviour
         {
             for (int z = 0; z < numOfBedHight; z++)
             {
-                GameObject obj = Instantiate(bed, new Vector3(x * spaceBetweenBed, 0.5f, z * spaceBetweenBed), Quaternion.identity);
+                GameObject obj = Instantiate(bed, new Vector3(x * spaceBetweenBed-12, 0.5f, z * spaceBetweenBed-8), Quaternion.Euler(new Vector3(0,270,0)));
 
                 bedplacements[z, x] = obj;
             }

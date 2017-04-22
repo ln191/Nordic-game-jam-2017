@@ -5,6 +5,7 @@ using UnityEngine;
 public class Bed : MonoBehaviour
 {
     public bool isOccupied;
+    public bool isMonsterOccupied;
 
     [SerializeField]
     private Vector3 currentPlacement;
