@@ -62,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
             for (int i = 0; i < players.Count; i++)
             {
                 players[i].GetComponent<PlayerMovement>().UpdateText();
+                //
             }
         }
 
