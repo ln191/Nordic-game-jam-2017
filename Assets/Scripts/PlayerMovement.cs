@@ -51,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetAxis("Fire" + playerNumber) == 0)
         {
             keyDown = false;
         }
@@ -124,19 +124,19 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.tag == "Bed")
         {
-            if (!keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetKey(KeyCode.Space))
+            if (!keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1)
             {
                 inBed = true;
                 transform.position = (new Vector3(other.gameObject.transform.position.x, 0.7f, other.gameObject.transform.position.z));
                 transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y + 90, 0));
                 other.GetComponent<Bed>().isOccupied = true;
                 keyDown = true;
-
+               
             }
 
             //Debug.Log("Bed test");   
 
-            else if (!keyDown && inBed && Input.GetKey(KeyCode.Space))
+            else if (!keyDown && inBed && Input.GetAxis("Fire" + playerNumber) == 1)
             {
                 other.GetComponent<Bed>().isOccupied = false;
                 inBed = false;
