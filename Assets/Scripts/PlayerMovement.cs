@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     private float timer;
     public bool automaticSpacing;
     private List<GameObject> players = new List<GameObject>();
+    private bool inBed;
 
     // Use this for initialization
     void Start()
@@ -72,25 +73,36 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //as long as player has health, he can move
-        if (health > 0)
+        if (health > 0 && !inBed)
         {
-            velocity.x = Input.GetAxis("Horizontal" + playerNumber);
-            velocity.z = Input.GetAxis("Vertical" + playerNumber);
+            //    velocity = new Vector3(Input.GetAxisRaw("Horizontal" + playerNumber), 0, Input.GetAxisRaw("Vertical" + playerNumber));
+            //    //velocity.x = Input.GetAxis("Horizontal" + playerNumber);
+            //    //velocity.z = Input.GetAxis("Vertical" + playerNumber);
 
-            if (velocity.magnitude > 1)
+            //    if (velocity.magnitude > 1)
+            //    {
+            //        velocity.Normalize();
+            //    }
+
+            //    rb.velocity = velocity * speed;
+
+            velocity = new Vector3(Input.GetAxisRaw("Horizontal" + playerNumber), 0, Input.GetAxisRaw("Vertical" + playerNumber));
+            
+            if (rb.velocity.magnitude < 10)
             {
-                velocity.Normalize();
+                rb.AddForce(velocity * speed);
             }
 
-            rb.velocity = velocity * speed;
+            if (velocity.x != 0 || velocity.z != 0)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(velocity), 0.25f);
+            }
         }
 
-        if (health <= 0)
+        if (health <= 0 || inBed)
         {
             rb.velocity = new Vector3(0, 0, 0);
         }
-
-        Debug.Log(velocity);
 
 
     }
@@ -101,5 +113,20 @@ public class PlayerMovement : MonoBehaviour
     public void UpdateText()
     {
         UI.text += ("Player " + playerNumber + " health: " + health + "\n");
+    }
+
+    public void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "Bed")
+        {
+            if (Input.GetKey(KeyCode.Space))
+            {
+                inBed = true;
+                transform.position = (new Vector3(other.gameObject.transform.position.x, 2, other.gameObject.transform.position.z));
+                transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y + 90, 0));
+            }
+
+            //Debug.Log("Bed test");    
+        }
     }
 }
