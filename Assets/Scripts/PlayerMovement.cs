@@ -15,7 +15,8 @@ public class PlayerMovement : MonoBehaviour
     private float timer;
     public bool automaticSpacing;
     private List<GameObject> players = new List<GameObject>();
-    private bool inBed;
+
+    private bool inBed, keyDown, keyTest;
 
     // Use this for initialization
     void Start()
@@ -50,6 +51,12 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            keyDown = false;
+        }
+
+
         if (UI.text == "")
         {
             for (int i = 0; i < players.Count; i++)
@@ -103,8 +110,6 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.velocity = new Vector3(0, 0, 0);
         }
-
-
     }
 
     /// <summary>
@@ -119,15 +124,28 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.tag == "Bed")
         {
-            if (Input.GetKey(KeyCode.Space) && !other.GetComponent<Bed>().isOccupied)
+            if (!keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetKey(KeyCode.Space))
             {
                 inBed = true;
-                transform.position = (new Vector3(other.gameObject.transform.position.x, 2, other.gameObject.transform.position.z));
+                transform.position = (new Vector3(other.gameObject.transform.position.x, 0.7f, other.gameObject.transform.position.z));
                 transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y + 90, 0));
                 other.GetComponent<Bed>().isOccupied = true;
+                keyDown = true;
+
             }
 
-            //Debug.Log("Bed test");    
+            //Debug.Log("Bed test");   
+
+            else if (!keyDown && inBed && Input.GetKey(KeyCode.Space))
+            {
+                other.GetComponent<Bed>().isOccupied = false;
+                inBed = false;
+                transform.position = (new Vector3(other.gameObject.transform.position.x - 2, 0.7f, other.gameObject.transform.position.z));
+                transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y, 0));
+                keyDown = true;
+            }
         }
+
+
     }
 }
