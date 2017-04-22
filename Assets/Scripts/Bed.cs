@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Bed : MonoBehaviour
 {
+    public bool isOccupied;
+
     [SerializeField]
     private Vector3 currentPlacement;
 
@@ -25,6 +27,7 @@ public class Bed : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        isOccupied = false;
     }
 
     // Update is called once per frame

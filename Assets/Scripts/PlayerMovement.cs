@@ -119,11 +119,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.tag == "Bed")
         {
-            if (Input.GetKey(KeyCode.Space))
+            if (Input.GetKey(KeyCode.Space) && !other.GetComponent<Bed>().isOccupied)
             {
                 inBed = true;
                 transform.position = (new Vector3(other.gameObject.transform.position.x, 2, other.gameObject.transform.position.z));
                 transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y + 90, 0));
+                other.GetComponent<Bed>().isOccupied = true;
             }
 
             //Debug.Log("Bed test");    
