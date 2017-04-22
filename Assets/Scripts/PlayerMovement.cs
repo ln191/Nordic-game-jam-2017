@@ -41,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
             players.Add(GameObject.FindGameObjectWithTag("Player" + i));
         }
 
-        UI = GameObject.Find("UI Text").GetComponent<Text>();
+        //UI = GameObject.Find("UI Text").GetComponent<Text>();
 
 
 
@@ -57,21 +57,21 @@ public class PlayerMovement : MonoBehaviour
         }
 
 
-        if (UI.text == "")
-        {
-            for (int i = 0; i < players.Count; i++)
-            {
-                players[i].GetComponent<PlayerMovement>().UpdateText();
-                //
-            }
-        }
+        //if (UI.text == "")
+        //{
+        //    for (int i = 0; i < players.Count; i++)
+        //    {
+        //        players[i].GetComponent<PlayerMovement>().UpdateText();
+        //        //
+        //    }
+        //}
 
         //timer += Time.deltaTime;
         if (timer > maxTimer)
         {
             health--;
             timer = 0;
-            UI.text = "";
+            //UI.text = "";
 
             for (int i = 0; i < players.Count; i++)
             {
@@ -128,8 +128,8 @@ public class PlayerMovement : MonoBehaviour
             if (!keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1)
             {
                 inBed = true;
-                transform.position = (new Vector3(other.gameObject.transform.position.x, 0.7f, other.gameObject.transform.position.z));
-                transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y + 90, 0));
+                transform.position = (new Vector3(other.gameObject.transform.position.x, 1.5f, other.gameObject.transform.position.z));
+                transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y, 0));
                 other.GetComponent<Bed>().isOccupied = true;
                 keyDown = true;
                
@@ -141,7 +141,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 other.GetComponent<Bed>().isOccupied = false;
                 inBed = false;
-                transform.position = (new Vector3(other.gameObject.transform.position.x - 2, 0.7f, other.gameObject.transform.position.z));
+                transform.position = (new Vector3(other.gameObject.transform.position.x, 0.7f, other.gameObject.transform.position.z - 2));
                 transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y, 0));
                 keyDown = true;
             }
