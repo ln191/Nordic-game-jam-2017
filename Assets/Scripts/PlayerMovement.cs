@@ -16,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
     public bool automaticSpacing;
     private List<GameObject> players = new List<GameObject>();
 
+    private bool inBed, keyDown, keyTest;
+
     // Use this for initialization
     void Start()
     {
@@ -49,6 +51,12 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (Input.GetAxis("Fire" + playerNumber) == 0)
+        {
+            keyDown = false;
+        }
+
+
         if (UI.text == "")
         {
             for (int i = 0; i < players.Count; i++)
@@ -72,27 +80,36 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //as long as player has health, he can move
-        if (health > 0)
+        if (health > 0 && !inBed)
         {
-            velocity.x = Input.GetAxis("Horizontal" + playerNumber);
-            velocity.z = Input.GetAxis("Vertical" + playerNumber);
+            //    velocity = new Vector3(Input.GetAxisRaw("Horizontal" + playerNumber), 0, Input.GetAxisRaw("Vertical" + playerNumber));
+            //    //velocity.x = Input.GetAxis("Horizontal" + playerNumber);
+            //    //velocity.z = Input.GetAxis("Vertical" + playerNumber);
 
-            if (velocity.magnitude > 1)
+            //    if (velocity.magnitude > 1)
+            //    {
+            //        velocity.Normalize();
+            //    }
+
+            //    rb.velocity = velocity * speed;
+
+            velocity = new Vector3(Input.GetAxisRaw("Horizontal" + playerNumber), 0, Input.GetAxisRaw("Vertical" + playerNumber));
+            
+            if (rb.velocity.magnitude < 10)
             {
-                velocity.Normalize();
+                rb.AddForce(velocity * speed);
             }
 
-            rb.velocity = velocity * speed;
+            if (velocity.x != 0 || velocity.z != 0)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(velocity), 0.25f);
+            }
         }
 
-        if (health <= 0)
+        if (health <= 0 || inBed)
         {
             rb.velocity = new Vector3(0, 0, 0);
         }
-
-        Debug.Log(velocity);
-
-
     }
 
     /// <summary>
@@ -101,5 +118,34 @@ public class PlayerMovement : MonoBehaviour
     public void UpdateText()
     {
         UI.text += ("Player " + playerNumber + " health: " + health + "\n");
+    }
+
+    public void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "Bed")
+        {
+            if (!keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1)
+            {
+                inBed = true;
+                transform.position = (new Vector3(other.gameObject.transform.position.x, 0.7f, other.gameObject.transform.position.z));
+                transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y + 90, 0));
+                other.GetComponent<Bed>().isOccupied = true;
+                keyDown = true;
+               
+            }
+
+            //Debug.Log("Bed test");   
+
+            else if (!keyDown && inBed && Input.GetAxis("Fire" + playerNumber) == 1)
+            {
+                other.GetComponent<Bed>().isOccupied = false;
+                inBed = false;
+                transform.position = (new Vector3(other.gameObject.transform.position.x - 2, 0.7f, other.gameObject.transform.position.z));
+                transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y, 0));
+                keyDown = true;
+            }
+        }
+
+
     }
 }
