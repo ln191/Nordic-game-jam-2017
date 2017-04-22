@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class Shuffle : MonoBehaviour
 {
+    public enum State
+    {
+        PreMonster, Shuffle, PostMonster, Play, Win
+    }
+
+    public State currentState;
+
     public GameObject bed;
 
     [Range(1f, 10f)]
@@ -14,6 +21,45 @@ public class Shuffle : MonoBehaviour
 
     private bool isMoving = false;
     private bool startTimer = false;
+
+    public bool IsMoving
+    {
+        get
+        {
+            return isMoving;
+        }
+
+        set
+        {
+            isMoving = value;
+        }
+    }
+
+    public bool StartTimer
+    {
+        get
+        {
+            return startTimer;
+        }
+
+        set
+        {
+            startTimer = value;
+        }
+    }
+
+    public GameObject[,] Bedplacements
+    {
+        get
+        {
+            return bedplacements;
+        }
+
+        set
+        {
+            bedplacements = value;
+        }
+    }
 
     [Range(0.5f, 5f)]
     public float timeBetweenShuffles = 0.5f;
@@ -83,57 +129,18 @@ public class Shuffle : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
-        bedplacements = new GameObject[3, 4];
-        Setupbeds(bedWidth, bedHeight);
+        //bedplacements = new GameObject[3, 4];
+        // Setupbeds(bedWidth, bedHeight);
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            startTimer = true;
-            isMoving = true;
-        }
-        if (startTimer)
-        {
-            timeleft -= Time.deltaTime;
-        }
-
-        if (timeleft < 0 && isMoving)
-        {
-            switch (level)
-            {
-                case 1:
-                    level1();
-                    break;
-
-                case 2:
-                    level2();
-                    break;
-
-                case 3:
-                    level3();
-                    break;
-
-                default:
-                    level1();
-                    break;
-            }
-
-            if (!isMoving)
-            {
-                startTimer = false;
-                ind = 0;
-            }
-            else
-            {
-                ind++;
-            }
-
-            timeleft = timeBetweenShuffles;
-        }
-        BedMovement();
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    startTimer = true;
+        //    isMoving = true;
+        //}
     }
 
     private void level1()
@@ -218,6 +225,53 @@ public class Shuffle : MonoBehaviour
         {
             isMoving = false;
         }
+    }
+
+    public void ShuffleState()
+    {
+        if (startTimer)
+        {
+            timeleft -= Time.deltaTime;
+        }
+
+        if (timeleft < 0 && isMoving)
+        {
+            switch (level)
+            {
+                case 1:
+                    level1();
+                    break;
+
+                case 2:
+                    level2();
+                    break;
+
+                case 3:
+                    level3();
+                    break;
+
+                default:
+                    level1();
+                    break;
+            }
+
+            if (!isMoving)
+            {
+                ind = 0;
+            }
+            else
+            {
+                ind++;
+            }
+
+            timeleft = timeBetweenShuffles;
+        }
+        else if (startTimer && timeleft < 0 && !isMoving)
+        {
+            gameObject.GetComponent<GameManager>().currentState = GameManager.State.PostMonster;
+            startTimer = false;
+        }
+        BedMovement();
     }
 
     /// <summary>
