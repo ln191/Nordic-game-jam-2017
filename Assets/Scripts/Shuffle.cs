@@ -284,7 +284,6 @@ public class Shuffle : MonoBehaviour
             for (int z = 0; z < numOfBedHight; z++)
             {
                 GameObject obj = Instantiate(bed, new Vector3(x * spaceBetweenBed, 0.5f, z * spaceBetweenBed), Quaternion.identity);
-                obj.GetComponent<Bed>().CurrentPlacement = new Vector3(x * spaceBetweenBed, 0.5f, z * spaceBetweenBed);
 
                 bedplacements[z, x] = obj;
             }
