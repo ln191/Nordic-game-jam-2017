@@ -5,20 +5,39 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
     private Vector3 velocity;
+    public int playerNumber;
     public float speed;
+    private string horizontalInput, verticalInput;
+    private Rigidbody rb;
+
 	// Use this for initialization
-	void Start () {
-		
-	}
+	void Start ()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate ()
+    {
 
-        velocity.x = Input.GetAxis("Horizontal");
-        velocity.y = Input.GetAxis("Vertical");
+        velocity.x = Input.GetAxis("Horizontal" + playerNumber);
+        velocity.y = Input.GetAxis("Vertical" + playerNumber);
 
-        transform.Translate(velocity * Time.deltaTime * speed);
-
+        if (velocity.magnitude > 1)
+        {
+            velocity.Normalize();
+        }
         
+
+        rb.velocity = velocity * Time.deltaTime * speed;
+
+        //rb.AddForce(velocity * Time.deltaTime * speed);
+
+        Debug.Log(velocity);
     }
+
+
+
+
+
 }
