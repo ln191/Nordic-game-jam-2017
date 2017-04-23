@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour
         PreMonster, Shuffle, PostMonster, Play, Win, Reset, End
     }
 
+    public AudioClip lever;
+    public AudioClip music;
+
     private float timer = 2;
     public GameObject Monster;
     public int monsterCount = 4;
@@ -21,12 +24,14 @@ public class GameManager : MonoBehaviour
     private List<GameObject> players = new List<GameObject>();
     public GameObject black;
     private bool Darkness = false;
+    private AudioSource audio;
 
     private int monsterCountTemp;
 
     // Use this for initialization
     private void Start()
     {
+        audio = GetComponent<AudioSource>();
         for (int i = 0; i < monsterCount; i++)
         {
             monsters.Add(Instantiate(Monster, new Vector3(0, 0, -4), Quaternion.identity));
@@ -104,6 +109,8 @@ public class GameManager : MonoBehaviour
             case State.Play:
                 if (!hasPlayed)
                 {
+                    audio.clip = music;
+                    audio.Play();
                     foreach (GameObject player in players)
                     {
                         player.GetComponent<PlayerMovement>().allowMovement = true;
@@ -129,7 +136,8 @@ public class GameManager : MonoBehaviour
                     black.SetActive(true);
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     Darkness = true;
-
+                    audio.clip = lever;
+                    audio.Play();
                     foreach (GameObject player in players)
                     {
                         player.GetComponent<PlayerMovement>().allowMovement = false;
@@ -140,11 +148,13 @@ public class GameManager : MonoBehaviour
                         }
                     }
 
-                    timer = 0.5f;
+                    timer = 3f;
                 }
 
                 if (timer <= 0 && !Darkness)
                 {
+                    audio.clip = lever;
+                    audio.Play();
                     black.SetActive(true);
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     Darkness = true;
@@ -159,10 +169,11 @@ public class GameManager : MonoBehaviour
                         }
                     }
 
-                    timer = 0.5f;
+                    timer = 3f;
                 }
                 else if (timer <= 0)
                 {
+
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     foreach (GameObject player in players)
                     {
@@ -172,6 +183,11 @@ public class GameManager : MonoBehaviour
                     black.SetActive(false);
                     currentState = State.Win;
                     timer = 5;
+                }
+
+                if (!audio.isPlaying)
+                {
+
                 }
 
                 break;
