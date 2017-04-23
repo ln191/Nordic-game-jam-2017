@@ -18,6 +18,13 @@ public class PlayerMovement : MonoBehaviour
     public bool allowMovement = false;
     private Vector3 startPos;
     private GameObject bed;
+    private AudioSource audio;
+
+    [SerializeField]
+    public AudioClip Scream;
+    public AudioClip Sleep1;
+    public AudioClip Sleep2;
+    //public AudioClip Sleep3;
 
     private bool inBed, keyDown, keyTest;
 
@@ -76,6 +83,7 @@ public class PlayerMovement : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        audio = GetComponent<AudioSource>();
 
         health = 3;
 
@@ -117,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
         //}
 
         //timer += Time.deltaTime;
-        
+
 
         //as long as player has health, he can move
         if (health > 0 && !inBed && allowMovement)
@@ -134,7 +142,7 @@ public class PlayerMovement : MonoBehaviour
             //    rb.velocity = velocity * speed;
 
             velocity = new Vector3(Input.GetAxisRaw("Horizontal" + playerNumber), 0, Input.GetAxisRaw("Vertical" + playerNumber));
-            
+
             if (rb.velocity.magnitude < 10)
             {
                 rb.AddForce(velocity * speed);
@@ -164,17 +172,26 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.tag == "Bed")
         {
-            if (!keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1 && allowMovement)
+            if (!InBed && !keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1 && allowMovement)
             {
                 inBed = true;
                 transform.position = (new Vector3(other.gameObject.transform.position.x, 1.5f, other.gameObject.transform.position.z));
                 transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y, 0));
                 other.GetComponent<Bed>().isOccupied = true;
                 keyDown = true;
-
                 bed = other.gameObject;
 
-               
+                if (Random.Range(1, 10f) < 5)
+                {
+                    audio.clip = Sleep1;
+                }
+                else
+                {
+                    audio.clip = Sleep2;
+                }
+
+                audio.volume = (0.5f);
+                audio.Play();
             }
 
             //Debug.Log("Bed test");   

@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
 
     public AudioClip lever;
     public AudioClip music;
+    public AudioClip scream1;
+
 
     private float timer = 2;
     public GameObject Monster;
@@ -109,6 +111,7 @@ public class GameManager : MonoBehaviour
             case State.Play:
                 if (!hasPlayed)
                 {
+                    audio.volume = 1;
                     audio.clip = music;
                     audio.Play();
                     foreach (GameObject player in players)
@@ -144,6 +147,7 @@ public class GameManager : MonoBehaviour
                         if (player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
                         {
                             player.GetComponent<PlayerMovement>().Health--;
+                            
                             player.SetActive(false);
                         }
                     }
@@ -185,9 +189,11 @@ public class GameManager : MonoBehaviour
                     timer = 5;
                 }
 
-                if (!audio.isPlaying)
+                if (!audio.isPlaying && audio.clip != scream1)
                 {
-
+                    audio.clip = scream1;
+                    audio.volume = 0.5f;
+                    audio.Play();
                 }
 
                 break;
@@ -201,6 +207,7 @@ public class GameManager : MonoBehaviour
                     {
                         if (player.GetComponent<PlayerMovement>().Health <= 0)
                         {
+
                             killThis.Add(player);
                         }
                     }
