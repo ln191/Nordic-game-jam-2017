@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 startPos;
     private GameObject bed;
     private AudioSource audio;
+    private Animator animator;
 
     [SerializeField]
     public AudioClip Scream;
@@ -113,6 +114,11 @@ public class PlayerMovement : MonoBehaviour
         audio = GetComponent<AudioSource>();
 
 
+
+        animator = GetComponentInChildren<Animator>();
+        animator.SetBool("walking", false);
+
+
         rb = GetComponent<Rigidbody>();
 
         startPos = transform.position;
@@ -168,7 +174,14 @@ public class PlayerMovement : MonoBehaviour
             //    rb.velocity = velocity * speed;
 
             velocity = new Vector3(Input.GetAxisRaw("Horizontal" + playerNumber), 0, Input.GetAxisRaw("Vertical" + playerNumber));
-
+            if (velocity.magnitude > 0.01f)
+            {
+                animator.SetBool("walking",true);
+            }
+            else
+            {
+                animator.SetBool("walking", false);
+            }
             if (rb.velocity.magnitude < 10)
             {
                 rb.AddForce(velocity * speed);
@@ -179,11 +192,23 @@ public class PlayerMovement : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(velocity), 0.25f);
             }
         }
+        else { animator.SetBool("walking", true); }
 
         if (health <= 0 || inBed)
         {
             rb.velocity = new Vector3(0, 0, 0);
         }
+
+        if (inBed)
+        {
+            animator.SetBool("walking", false);
+        }
+
+        if (!allowMovement)
+        {
+            animator.SetBool("walking", false);
+        }
+
     }
 
     /// <summary>
@@ -201,6 +226,8 @@ public class PlayerMovement : MonoBehaviour
             if (!InBed && !keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1 && allowMovement)
             {
                 inBed = true;
+
+                animator.SetBool("walking", false);
                 transform.position = (new Vector3(other.gameObject.transform.position.x, 1.5f, other.gameObject.transform.position.z));
                 transform.rotation = Quaternion.Euler(new Vector3(90, other.transform.rotation.y + 90, 90));
                 other.GetComponent<Bed>().isOccupied = true;
@@ -242,5 +269,6 @@ public class PlayerMovement : MonoBehaviour
         gameObject.SetActive(true);
         inBed = false;
         allowMovement = false;
+        animator.SetBool("walking", false);
     }
 }

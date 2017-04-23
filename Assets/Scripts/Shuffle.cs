@@ -65,7 +65,7 @@ public class Shuffle : MonoBehaviour
     public float timeBetweenShuffles = 0.5f;
 
     public float timeleft = 0.5f;
-    private int level = 3;
+    private int level = 4;
     private int ind = 0;
     // private List<GameObject> beds = new List<GameObject>();
 
@@ -227,6 +227,75 @@ public class Shuffle : MonoBehaviour
         }
     }
 
+    private void RandomLevel()
+    {
+
+        if (ind == 0)
+        {
+            bedplacements = RandomBedPlace();
+        }
+        else if (ind == 1)
+        {
+            bedplacements = RandomBedPlace();
+        }
+        else if (ind == 2)
+        {
+            bedplacements = RandomBedPlace();
+        }
+        else if (ind == 3)
+        {
+            bedplacements = RandomBedPlace();
+        }
+        else if (ind == 4)
+        {
+            bedplacements = RandomBedPlace();
+        }
+        else if (ind == 5)
+        {
+            bedplacements = RandomBedPlace();
+        }
+        else
+        {
+            isMoving = false;
+        }
+    }
+
+    private GameObject[,] RandomBedPlace()
+    {
+        int ran = Random.Range(0, 7);
+
+        GameObject[,] bedplacementsTemp = new GameObject[3,4];
+        if (ran == 0)
+        {
+            bedplacementsTemp = ShuffleBed(clockPos);
+        }
+        else if (ran == 1)
+        {
+            bedplacementsTemp = ShuffleBed(bbb);
+        }
+        else if (ran == 2)
+        {
+            bedplacementsTemp = ShuffleBed(doublecountClock);
+        }
+        else if (ran == 3)
+        {
+            bedplacementsTemp = ShuffleBed(crossClock);
+        }
+        else if (ran == 4)
+        {
+            bedplacementsTemp = ShuffleBed(aaa);
+        }
+        else if (ran == 5)
+        {
+            bedplacementsTemp = ShuffleBed(midclock);
+        }
+        else if (ran == 6)
+        {
+            bedplacementsTemp = ShuffleBed(countClock);
+        }
+        return bedplacementsTemp;
+    }
+
     public void ShuffleState()
     {
         if (startTimer)
@@ -249,7 +318,9 @@ public class Shuffle : MonoBehaviour
                 case 3:
                     level3();
                     break;
-
+                case 4:
+                    RandomLevel();
+                    break;
                 default:
                     level1();
                     break;
