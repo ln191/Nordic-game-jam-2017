@@ -38,31 +38,21 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
 
-        Vector3 pos = Vector3.zero;
-	audio = GetComponent<AudioSource>();
-        for (int i = 1; i < GameObject.Find("MenuScript").GetComponent<MenuScript>().Players + 1; i++)
-	{	
-	    if (i == 1)
+        audio = GetComponent<AudioSource>();
+        for (int i = 1; i < 5; i++)
+        {
+            GameObject tempPlayer = GameObject.FindGameObjectWithTag("Player" + i);
+            if (i < GameObject.Find("MenuScript").GetComponent<MenuScript>().Players + 1)
             {
-                pos = new Vector3(-8, 0, 14);
+                players.Add(tempPlayer);
             }
-            else if (i == 2)
+            else
             {
-                pos = new Vector3(8, 0, -14);
+                tempPlayer.SetActive(false);
             }
-            else if (i == 3)
-            {
-                pos = new Vector3(-8, 0, -14);
-            }
-            else if (i == 4)
-            {
-                pos = new Vector3(8, 0, 14);
-            }
-            GameObject tempPlayer = GameObject.Instantiate<GameObject>(playerTemplate, pos, Quaternion.identity);
             tempPlayer.GetComponent<PlayerMovement>().PlayerNumber = i;
-            tempPlayer.tag = "Player" + i;
-            players.Add(tempPlayer);
-	}
+
+        }
 
         monsterCount = GameObject.Find("MenuScript").GetComponent<MenuScript>().EnemiesWaveOne;
         monsterCountToo = GameObject.Find("MenuScript").GetComponent<MenuScript>().EnemiesWaveTwo + monsterCount;
@@ -182,7 +172,7 @@ public class GameManager : MonoBehaviour
                         if (player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
                         {
                             player.GetComponent<PlayerMovement>().Health--;
-                            
+
                             player.SetActive(false);
                         }
                     }
