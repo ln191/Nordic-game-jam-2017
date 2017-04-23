@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public enum State
     {
-        PreMonster, Shuffle, PostMonster, Play, Win
+        PreMonster, Shuffle, PostMonster, Play, Win, Reset, End
     }
 
     private float timer = 2;
@@ -18,6 +19,10 @@ public class GameManager : MonoBehaviour
     private List<GameObject> monsters = new List<GameObject>();
     private bool hasPlayed = false;
     private List<GameObject> players = new List<GameObject>();
+    public GameObject black;
+    private bool Darkness = false;
+
+    private int monsterCountTemp;
 
     // Use this for initialization
     private void Start()
@@ -26,11 +31,16 @@ public class GameManager : MonoBehaviour
         {
             monsters.Add(Instantiate(Monster, new Vector3(0, 0, -4), Quaternion.identity));
         }
+        for (int i = 0; i < 4; i++)
+        {
+            players.Add(GameObject.FindGameObjectWithTag("Player" + (i + 1)));
+        }
 
-        gameObject.GetComponent<Shuffle>().Bedplacements = new GameObject[3, 4];
-        gameObject.GetComponent<Shuffle>().Setupbeds(4, 3);
+            GetComponent<Shuffle>().Bedplacements = new GameObject[3, 4];
+        GetComponent<Shuffle>().Setupbeds(4, 3);
         currentState = State.PreMonster;
-
+        black.SetActive(false);
+        monsterCountTemp = monsterCount;
     }
 
     // Update is called once per frame
@@ -48,7 +58,7 @@ public class GameManager : MonoBehaviour
                     {
                         foreach (GameObject obj in monsters)
                         {
-                            obj.active = false;
+                            Destroy(obj);
                         }
                         currentState = State.Shuffle;
                         gameObject.GetComponent<Shuffle>().IsMoving = true;
@@ -65,11 +75,12 @@ public class GameManager : MonoBehaviour
 
             case State.PostMonster:
 
-                if (monsterCount <= monsterCountToo)
+
+                if (monsterCountTemp <= monsterCountToo)
                 {
-                    for (int i = 0; i < monsterCountToo - monsterCount; i++)
+                    for (int i = 0; i < monsterCountToo - monsterCountTemp; i++)
                     {
-                        monsterCount++;
+                        monsterCountTemp++;
                         monsters.Add(Instantiate(Monster, new Vector3(0, 0, -4), Quaternion.identity));
                     }
 
@@ -82,7 +93,7 @@ public class GameManager : MonoBehaviour
                     {
                         foreach (GameObject obj in monsters)
                         {
-                            obj.SetActive(false);
+                            Destroy(obj);
                         }
                         currentState = State.Play;
                         timer = 2;
@@ -93,21 +104,17 @@ public class GameManager : MonoBehaviour
             case State.Play:
                 if (!hasPlayed)
                 {
-                    for (int i = 0; i < 4; i++)
+                    foreach (GameObject player in players)
                     {
-                        players.Add(GameObject.FindGameObjectWithTag("Player" + (i+1)));
-                        players[i].GetComponent<PlayerMovement>().allowMovement = true;
+                        player.GetComponent<PlayerMovement>().allowMovement = true;
                     }
+                        
+                    
                     timer = 15;
                     hasPlayed = true;
                 }
 
                 timer -= Time.deltaTime;
-
-                foreach (GameObject player in players)
-                {
-
-                }
                 int peopleInBed = 0;
                 foreach (GameObject player in players)
                 {
@@ -116,39 +123,122 @@ public class GameManager : MonoBehaviour
                         peopleInBed++;
                     }
                 }
-                if (peopleInBed >= players.Count)
+
+                if (peopleInBed >= players.Count && !Darkness)
                 {
-                    timer = 0;
+                    black.SetActive(true);
+                    GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
+                    Darkness = true;
+
+                    foreach (GameObject player in players)
+                    {
+                        player.GetComponent<PlayerMovement>().allowMovement = false;
+                        if (player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
+                        {
+                            player.GetComponent<PlayerMovement>().Health--;
+                            player.SetActive(false);
+                        }
+                    }
+
+                    timer = 0.5f;
                 }
 
+                if (timer <= 0 && !Darkness)
+                {
+                    black.SetActive(true);
+                    GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
+                    Darkness = true;
+
+                    foreach (GameObject player in players)
+                    {
+                        player.GetComponent<PlayerMovement>().allowMovement = false;
+                        if (player.GetComponent<PlayerMovement>().InBed != true || player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
+                        {
+                            player.GetComponent<PlayerMovement>().Health--;
+                            player.SetActive(false);
+                        }
+                    }
+
+                    timer = 0.5f;
+                }
+                else if (timer <= 0)
+                {
+                    GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
+                    foreach (GameObject player in players)
+                    {
+                        GameObject.Find("PlayerLives").GetComponent<Text>().text += "Player " + (player.GetComponent<PlayerMovement>().playerNumber) + " health: " +
+(player.GetComponent<PlayerMovement>().Health) + "\n";
+                    }
+                    black.SetActive(false);
+                    currentState = State.Win;
+                    timer = 5;
+                }
+
+                break;
+
+            case State.Win:
+                timer -= Time.deltaTime;
+                List<GameObject> killThis = new List<GameObject>();
                 if (timer <= 0)
                 {
                     foreach (GameObject player in players)
                     {
-
-
-
-                        if (player.GetComponent<PlayerMovement>().InBed != true)
+                        if (player.GetComponent<PlayerMovement>().Health <= 0)
                         {
-                            player.GetComponent<PlayerMovement>().Health--;
-                            player.SetActive(false);
-                        }
-                        else if (player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
-                        {
-                            player.GetComponent<PlayerMovement>().Health--;
-                            player.SetActive(false);
-                        }
-                        else
-                        {
-                            player.GetComponent<PlayerMovement>().allowMovement = true;
+                            killThis.Add(player);
                         }
                     }
+                    while (killThis.Count > 0)
+                    {
+                        players.Remove(killThis[0]);
+                        killThis.Remove(killThis[0]);
+                    }
 
+                    GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
+                    foreach (GameObject player in players)
+                    {
+                        GameObject.Find("PlayerLives").GetComponent<Text>().text += "Player " + (player.GetComponent<PlayerMovement>().playerNumber) + " health: " +
+                        (player.GetComponent<PlayerMovement>().Health) + "\n";
+                    }
 
+                    if (players.Count <= 1)
+                    {
+
+                        currentState = State.End;
+
+                    }
+                    else
+                    {
+                        currentState = State.Reset;
+                    }
                 }
+
+                break;
+            case State.Reset:
+                foreach (GameObject player in players)
+                {
+                    player.GetComponent<PlayerMovement>().Reset();
+                }
+                monsterCountTemp = monsterCount;
+
+                foreach (GameObject bed in GetComponent<Shuffle>().Bedplacements)
+                {
+                    bed.GetComponent<Bed>().Reset();
+                }
+                monsters.Clear();
+                for (int i = 0; i < monsterCount; i++)
+                {
+                    monsters.Add(Instantiate(Monster, new Vector3(0, 0, -4), Quaternion.identity));
+                }
+                hasPlayed = false;
+                monsterPlaced = 0;
+                currentState = State.PreMonster;
+                Darkness = false;
+                timer = 2;
                 break;
 
-            case State.Win:
+            case State.End:
+                
                 break;
 
             default:
