@@ -94,6 +94,8 @@ public class MenuScript : MonoBehaviour
     }
     public void StartGame()
     {
+        ChangeEnemiesWaveOne();
+        ChangeEnemiesWaveTwo();
         UnityEngine.SceneManagement.SceneManager.LoadScene("main");
         GameObject.Find("OptionCanvas").active = false;
     }
