@@ -9,13 +9,13 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private Text UI;
     public int maxTimer;
-    public int playerNumber;
-    private int health;
+    private int playerNumber;
+    public int health;
     public float speed;
     private float timer;
     public bool automaticSpacing;
     private List<GameObject> players = new List<GameObject>();
-    public bool allowMovement = false;
+    private bool allowMovement = false;
     private Vector3 startPos;
     private GameObject bed;
 
@@ -73,12 +73,36 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public int PlayerNumber
+    {
+        get
+        {
+            return playerNumber;
+        }
+
+        set
+        {
+            playerNumber = value;
+        }
+    }
+
+    public bool AllowMovement
+    {
+        get
+        {
+            return allowMovement;
+        }
+
+        set
+        {
+            allowMovement = value;
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
-
         health = 3;
-
         rb = GetComponent<Rigidbody>();
 
         startPos = transform.position;
@@ -86,10 +110,10 @@ public class PlayerMovement : MonoBehaviour
 
 
 
-        for (int i = 1; i < 5; i++)
-        {
-            players.Add(GameObject.FindGameObjectWithTag("Player" + i));
-        }
+        //for (int i = 1; i < GameObject.Find("MenuScript").GetComponent<MenuScript>().Players + 1; i++)
+        //{
+        //    players.Add(GameObject.FindGameObjectWithTag("Player" + i));
+        //}
 
         //UI = GameObject.Find("UI Text").GetComponent<Text>();
 

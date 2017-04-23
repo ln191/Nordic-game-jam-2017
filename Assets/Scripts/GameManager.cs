@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviour
 
     private float timer = 2;
     public GameObject Monster;
-    public int monsterCount = 4;
-    public int monsterCountToo = 7;
+    public int monsterCount;
+    public int monsterCountToo;
     public State currentState;
     public int monsterPlaced;
     private List<GameObject> monsters = new List<GameObject>();
@@ -21,22 +21,52 @@ public class GameManager : MonoBehaviour
     private List<GameObject> players = new List<GameObject>();
     public GameObject black;
     private bool Darkness = false;
+    public GameObject playerTemplate;
 
     private int monsterCountTemp;
 
     // Use this for initialization
     private void Start()
     {
+        Vector3 pos = Vector3.zero;
+        for (int i = 1; i < GameObject.Find("MenuScript").GetComponent<MenuScript>().Players + 1; i++)
+        {
+            if (i == 1)
+            {
+                pos = new Vector3(-8, 0, 14);
+            }
+            else if (i == 2)
+            {
+                pos = new Vector3(8, 0, -14);
+            }
+            else if (i == 3)
+            {
+                pos = new Vector3(-8, 0, -14);
+            }
+            else if (i == 4)
+            {
+                pos = new Vector3(8, 0, 14);
+            }
+            GameObject tempPlayer = GameObject.Instantiate<GameObject>(playerTemplate, pos, Quaternion.identity);
+            tempPlayer.GetComponent<PlayerMovement>().PlayerNumber = i;
+            tempPlayer.tag = "Player" + i;
+            players.Add(tempPlayer);
+        }
+        monsterCount = GameObject.Find("MenuScript").GetComponent<MenuScript>().EnemiesWaveOne;
+        monsterCountToo = GameObject.Find("MenuScript").GetComponent<MenuScript>().EnemiesWaveTwo + monsterCount;
+
+
         for (int i = 0; i < monsterCount; i++)
         {
             monsters.Add(Instantiate(Monster, new Vector3(0, 0, -4), Quaternion.identity));
         }
-        for (int i = 0; i < 4; i++)
-        {
-            players.Add(GameObject.FindGameObjectWithTag("Player" + (i + 1)));
-        }
 
-            GetComponent<Shuffle>().Bedplacements = new GameObject[3, 4];
+        //for (int i = 0; i < 4; i++)
+        //{
+        //    players.Add(GameObject.FindGameObjectWithTag("Player" + (i + 1)));
+        //}
+
+        GetComponent<Shuffle>().Bedplacements = new GameObject[3, 4];
         GetComponent<Shuffle>().Setupbeds(4, 3);
         currentState = State.PreMonster;
         black.SetActive(false);
@@ -106,10 +136,10 @@ public class GameManager : MonoBehaviour
                 {
                     foreach (GameObject player in players)
                     {
-                        player.GetComponent<PlayerMovement>().allowMovement = true;
+                        player.GetComponent<PlayerMovement>().AllowMovement = true;
                     }
-                        
-                    
+
+
                     timer = 15;
                     hasPlayed = true;
                 }
@@ -132,7 +162,7 @@ public class GameManager : MonoBehaviour
 
                     foreach (GameObject player in players)
                     {
-                        player.GetComponent<PlayerMovement>().allowMovement = false;
+                        player.GetComponent<PlayerMovement>().AllowMovement = false;
                         if (player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
                         {
                             player.GetComponent<PlayerMovement>().Health--;
@@ -151,7 +181,7 @@ public class GameManager : MonoBehaviour
 
                     foreach (GameObject player in players)
                     {
-                        player.GetComponent<PlayerMovement>().allowMovement = false;
+                        player.GetComponent<PlayerMovement>().AllowMovement = false;
                         if (player.GetComponent<PlayerMovement>().InBed != true || player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
                         {
                             player.GetComponent<PlayerMovement>().Health--;
@@ -166,7 +196,7 @@ public class GameManager : MonoBehaviour
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     foreach (GameObject player in players)
                     {
-                        GameObject.Find("PlayerLives").GetComponent<Text>().text += "Player " + (player.GetComponent<PlayerMovement>().playerNumber) + " health: " +
+                        GameObject.Find("PlayerLives").GetComponent<Text>().text += "Player " + (player.GetComponent<PlayerMovement>().PlayerNumber) + " health: " +
 (player.GetComponent<PlayerMovement>().Health) + "\n";
                     }
                     black.SetActive(false);
@@ -197,7 +227,7 @@ public class GameManager : MonoBehaviour
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     foreach (GameObject player in players)
                     {
-                        GameObject.Find("PlayerLives").GetComponent<Text>().text += "Player " + (player.GetComponent<PlayerMovement>().playerNumber) + " health: " +
+                        GameObject.Find("PlayerLives").GetComponent<Text>().text += "Player " + (player.GetComponent<PlayerMovement>().PlayerNumber) + " health: " +
                         (player.GetComponent<PlayerMovement>().Health) + "\n";
                     }
 
@@ -238,7 +268,7 @@ public class GameManager : MonoBehaviour
                 break;
 
             case State.End:
-                
+
                 break;
 
             default:
