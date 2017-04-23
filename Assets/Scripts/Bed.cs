@@ -35,4 +35,11 @@ public class Bed : MonoBehaviour
     private void Update()
     {
     }
+
+    public void Reset()
+    {
+        isOccupied = false;
+        isMonsterOccupied = false;
+
+    }
 }

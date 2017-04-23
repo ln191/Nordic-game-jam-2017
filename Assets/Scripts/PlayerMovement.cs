@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public int maxTimer;
     public int playerNumber;
     private int health;
-    public float startPosX, startPosY, speed;
+    public float speed;
     private float timer;
     public bool automaticSpacing;
     private List<GameObject> players = new List<GameObject>();
@@ -60,6 +60,19 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public Vector3 StartPos
+    {
+        get
+        {
+            return startPos;
+        }
+
+        set
+        {
+            startPos = value;
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -88,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Input.GetAxisRaw("Fire" + playerNumber) == 0 && allowMovement)
+        if (Input.GetAxisRaw("Fire" + playerNumber) == 0)
         {
             keyDown = false;
         }
@@ -104,18 +117,7 @@ public class PlayerMovement : MonoBehaviour
         //}
 
         //timer += Time.deltaTime;
-        if (timer > maxTimer)
-        {
-            health--;
-            timer = 0;
-            //UI.text = "";
-
-            for (int i = 0; i < players.Count; i++)
-            {
-                players[i].GetComponent<PlayerMovement>().UpdateText();
-            }
-
-        }
+        
 
         //as long as player has health, he can move
         if (health > 0 && !inBed && allowMovement)
@@ -162,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.tag == "Bed")
         {
-            if (!keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1)
+            if (!keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1 && allowMovement)
             {
                 inBed = true;
                 transform.position = (new Vector3(other.gameObject.transform.position.x, 1.5f, other.gameObject.transform.position.z));
@@ -177,7 +179,7 @@ public class PlayerMovement : MonoBehaviour
 
             //Debug.Log("Bed test");   
 
-            else if (!keyDown && inBed && Input.GetAxis("Fire" + playerNumber) == 1)
+            else if (!keyDown && inBed && Input.GetAxis("Fire" + playerNumber) == 1 && allowMovement)
             {
                 other.GetComponent<Bed>().isOccupied = false;
                 inBed = false;
@@ -187,6 +189,15 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+    }
 
+
+
+    public void Reset()
+    {
+        transform.position = startPos;
+        gameObject.SetActive(true);
+        inBed = false;
+        allowMovement = false;
     }
 }
