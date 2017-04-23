@@ -203,7 +203,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 inBed = true;
                 transform.position = (new Vector3(other.gameObject.transform.position.x, 1.5f, other.gameObject.transform.position.z));
-                transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(90, other.transform.rotation.y + 90, 90));
                 other.GetComponent<Bed>().isOccupied = true;
                 keyDown = true;
                 bed = other.gameObject;
