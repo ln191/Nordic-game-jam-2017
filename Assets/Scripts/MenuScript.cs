@@ -59,7 +59,7 @@ public class MenuScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (quit)
+        if (quit || Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
         }

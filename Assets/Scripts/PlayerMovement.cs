@@ -113,7 +113,6 @@ public class PlayerMovement : MonoBehaviour
         audio = GetComponent<AudioSource>();
 
 
-        health = 3;
         rb = GetComponent<Rigidbody>();
 
         startPos = transform.position;

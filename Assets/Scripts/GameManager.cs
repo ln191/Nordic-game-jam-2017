@@ -28,8 +28,9 @@ public class GameManager : MonoBehaviour
     public GameObject black;
     private bool Darkness = false, showButton = true;
     private int round = 1;
-    private GameObject button;
-    private Text buttonText;
+    private GameObject button, winButton, winButton2, mainMenuButton;
+    private Text buttonText, winButtonText, winButton2Text;
+    private bool lastMessageShown = false;
 
     public GameObject playerTemplate;
 
@@ -43,6 +44,20 @@ public class GameManager : MonoBehaviour
     {
         button = GameObject.Find("NightButton");
         buttonText = GameObject.Find("NightButtonText").GetComponent<Text>();
+
+        winButton = GameObject.Find("WinnerButton");
+        winButtonText = GameObject.Find("WinnerButtonText").GetComponent<Text>();
+
+        winButton2 = GameObject.Find("WinnerButton2");
+        winButton2Text = GameObject.Find("WinnerButtonText2").GetComponent<Text>();
+        winButton2.SetActive(false);
+
+        mainMenuButton = GameObject.Find("MainMenuButton");
+        mainMenuButton.SetActive(false);
+
+
+        winButton.SetActive(false);
+
         audio = GetComponent<AudioSource>();
         for (int i = 1; i < 5; i++)
         {
@@ -68,10 +83,6 @@ public class GameManager : MonoBehaviour
             monsters.Add(Instantiate(Monster, new Vector3(0, 0, -4), Quaternion.identity));
         }
 
-        //for (int i = 0; i < 4; i++)
-        //{
-        //    players.Add(GameObject.FindGameObjectWithTag("Player" + (i + 1)));
-        //}
 
         GetComponent<Shuffle>().Bedplacements = new GameObject[3, 4];
         GetComponent<Shuffle>().Setupbeds(4, 3);
@@ -303,7 +314,7 @@ public class GameManager : MonoBehaviour
 
                 showButton = true;
                 currentState = State.PreMonster;
-                string tempString = buttonText.text.Split(' ')[0] + " "+ round;
+                string tempString = buttonText.text.Split(' ')[0] + " " + round;
                 buttonText.text = tempString;
                 tempTimer = 2;
                 Darkness = false;
@@ -311,11 +322,45 @@ public class GameManager : MonoBehaviour
                 break;
 
             case State.End:
+                if (players.Count == 1 && !lastMessageShown)
+                {
+                    
 
+                    tempString = winButtonText.text.Split('$')[0] + " " + players[0].tag.ToString()+ " " + winButtonText.text.Split('$')[1];
+                    winButtonText.text = tempString;
+
+                    tempString = winButton2Text.text.Split('$')[0] + " " + round + " " + winButton2Text.text.Split('$')[1];
+                    winButton2Text.text = tempString;
+
+                    winButton.SetActive(true);
+                    winButton2.SetActive(true);
+                    lastMessageShown = true;
+                    mainMenuButton.SetActive(true);
+                }
+                else if (players.Count == 0 && !lastMessageShown)
+                {
+                    winButtonText.text = "Unfortunately, no one was able to survive the endless nights";
+
+                    tempString = winButton2Text.text.Split('$')[0] + " " + round + " " + winButton2Text.text.Split('$')[1];
+                    winButton2Text.text = tempString;
+                    winButton2.SetActive(true);
+                    winButton.SetActive(true);
+                    lastMessageShown = true;
+                    mainMenuButton.SetActive(true);
+                }
+                
                 break;
 
             default:
                 break;
         }
+    }
+
+    public void SwitchToMainMenu()
+    {
+        
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+
     }
 }
