@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
 
 
     private float timer = 2;
+    private float tempTimer = 2;
     public GameObject Monster;
     public int monsterCount;
     public int monsterCountToo;
@@ -25,7 +26,10 @@ public class GameManager : MonoBehaviour
     private bool hasPlayed = false;
     private List<GameObject> players = new List<GameObject>();
     public GameObject black;
-    private bool Darkness = false;
+    private bool Darkness = false, showButton = true;
+    private int round = 1;
+    private GameObject button;
+    private Text buttonText;
 
     public GameObject playerTemplate;
 
@@ -37,7 +41,8 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
-
+        button = GameObject.Find("NightButton");
+        buttonText = GameObject.Find("NightButtonText").GetComponent<Text>();
         audio = GetComponent<AudioSource>();
         for (int i = 1; i < 5; i++)
         {
@@ -82,6 +87,20 @@ public class GameManager : MonoBehaviour
         {
             case State.PreMonster:
 
+
+
+                if (tempTimer >= 0 && showButton)
+                {
+                    button.SetActive(true);
+
+                    tempTimer -= Time.deltaTime;
+                }
+                else if (tempTimer < 0 && showButton)
+                {
+
+                    button.SetActive(false);
+                    showButton = false;
+                }
 
                 if (monsterPlaced >= monsterCount)
                 {
@@ -280,7 +299,13 @@ public class GameManager : MonoBehaviour
                 }
                 hasPlayed = false;
                 monsterPlaced = 0;
+                round++;
+
+                showButton = true;
                 currentState = State.PreMonster;
+                string tempString = buttonText.text.Split(' ')[0] + " "+ round;
+                buttonText.text = tempString;
+                tempTimer = 2;
                 Darkness = false;
                 timer = 2;
                 break;
