@@ -10,6 +10,11 @@ public class GameManager : MonoBehaviour
         PreMonster, Shuffle, PostMonster, Play, Win, Reset, End
     }
 
+    public AudioClip lever;
+    public AudioClip music;
+    public AudioClip scream1;
+
+
     private float timer = 2;
     public GameObject Monster;
     public int monsterCount;
@@ -21,17 +26,23 @@ public class GameManager : MonoBehaviour
     private List<GameObject> players = new List<GameObject>();
     public GameObject black;
     private bool Darkness = false;
+
     public GameObject playerTemplate;
+
+    private AudioSource audio;
+
 
     private int monsterCountTemp;
 
     // Use this for initialization
     private void Start()
     {
+
         Vector3 pos = Vector3.zero;
+	audio = GetComponent<AudioSource>();
         for (int i = 1; i < GameObject.Find("MenuScript").GetComponent<MenuScript>().Players + 1; i++)
-        {
-            if (i == 1)
+	{	
+	    if (i == 1)
             {
                 pos = new Vector3(-8, 0, 14);
             }
@@ -51,7 +62,8 @@ public class GameManager : MonoBehaviour
             tempPlayer.GetComponent<PlayerMovement>().PlayerNumber = i;
             tempPlayer.tag = "Player" + i;
             players.Add(tempPlayer);
-        }
+	}
+
         monsterCount = GameObject.Find("MenuScript").GetComponent<MenuScript>().EnemiesWaveOne;
         monsterCountToo = GameObject.Find("MenuScript").GetComponent<MenuScript>().EnemiesWaveTwo + monsterCount;
 
@@ -134,6 +146,9 @@ public class GameManager : MonoBehaviour
             case State.Play:
                 if (!hasPlayed)
                 {
+                    audio.volume = 1;
+                    audio.clip = music;
+                    audio.Play();
                     foreach (GameObject player in players)
                     {
                         player.GetComponent<PlayerMovement>().AllowMovement = true;
@@ -159,22 +174,26 @@ public class GameManager : MonoBehaviour
                     black.SetActive(true);
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     Darkness = true;
-
+                    audio.clip = lever;
+                    audio.Play();
                     foreach (GameObject player in players)
                     {
                         player.GetComponent<PlayerMovement>().AllowMovement = false;
                         if (player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
                         {
                             player.GetComponent<PlayerMovement>().Health--;
+                            
                             player.SetActive(false);
                         }
                     }
 
-                    timer = 0.5f;
+                    timer = 3f;
                 }
 
                 if (timer <= 0 && !Darkness)
                 {
+                    audio.clip = lever;
+                    audio.Play();
                     black.SetActive(true);
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     Darkness = true;
@@ -189,10 +208,11 @@ public class GameManager : MonoBehaviour
                         }
                     }
 
-                    timer = 0.5f;
+                    timer = 3f;
                 }
                 else if (timer <= 0)
                 {
+
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     foreach (GameObject player in players)
                     {
@@ -202,6 +222,13 @@ public class GameManager : MonoBehaviour
                     black.SetActive(false);
                     currentState = State.Win;
                     timer = 5;
+                }
+
+                if (!audio.isPlaying && audio.clip != scream1)
+                {
+                    audio.clip = scream1;
+                    audio.volume = 0.5f;
+                    audio.Play();
                 }
 
                 break;
@@ -215,6 +242,7 @@ public class GameManager : MonoBehaviour
                     {
                         if (player.GetComponent<PlayerMovement>().Health <= 0)
                         {
+
                             killThis.Add(player);
                         }
                     }
