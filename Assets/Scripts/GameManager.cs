@@ -13,7 +13,9 @@ public class GameManager : MonoBehaviour
     public AudioClip lever;
     public AudioClip music;
     public AudioClip scream1;
+    public GameObject MonsterRemnant, Blood;
 
+    private List<GameObject> leftovers = new List<GameObject>();
 
     private float timer = 2;
     private float tempTimer = 2;
@@ -31,6 +33,7 @@ public class GameManager : MonoBehaviour
     private GameObject button, winButton, winButton2, mainMenuButton;
     private Text buttonText, winButtonText, winButton2Text;
     private bool lastMessageShown = false;
+    private bool playScream;
 
     public GameObject playerTemplate;
 
@@ -202,11 +205,23 @@ public class GameManager : MonoBehaviour
                         if (player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
                         {
                             player.GetComponent<PlayerMovement>().Health--;
+                            playScream = true;
 
                             player.SetActive(false);
                         }
                     }
+                    foreach (GameObject bed in GetComponent<Shuffle>().Bedplacements)
+                    {
+                        if (bed.GetComponent<Bed>().isMonsterOccupied && bed.GetComponent<Bed>().isOccupied)
+                        {
+                            leftovers.Add(Instantiate(Blood, bed.transform.position, Quaternion.identity));
 
+                        }
+                        else if (bed.GetComponent<Bed>().isMonsterOccupied)
+                        {
+                            leftovers.Add(Instantiate(MonsterRemnant, bed.transform.position, Quaternion.identity));
+                        }
+                    }
                     timer = 3f;
                 }
 
@@ -224,7 +239,21 @@ public class GameManager : MonoBehaviour
                         if (player.GetComponent<PlayerMovement>().InBed != true || player.GetComponent<PlayerMovement>().Bed.GetComponent<Bed>().isMonsterOccupied)
                         {
                             player.GetComponent<PlayerMovement>().Health--;
+                            playScream = true;
                             player.SetActive(false);
+                        }
+                    }
+
+                    foreach (GameObject bed in GetComponent<Shuffle>().Bedplacements)
+                    {
+                        if (bed.GetComponent<Bed>().isMonsterOccupied && bed.GetComponent<Bed>().isOccupied)
+                        {
+                            leftovers.Add(Instantiate(Blood, bed.transform.position, Quaternion.identity));
+                            
+                        }
+                        else if (bed.GetComponent<Bed>().isMonsterOccupied)
+                        {
+                            leftovers.Add(Instantiate(MonsterRemnant, bed.transform.position, Quaternion.identity));
                         }
                     }
 
@@ -235,8 +264,9 @@ public class GameManager : MonoBehaviour
 
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     foreach (GameObject player in players)
-                    {
-                        GameObject.Find("PlayerLives").GetComponent<Text>().text += "Player " + (player.GetComponent<PlayerMovement>().PlayerNumber) + " health: " +
+                    { 
+
+                        GameObject.Find("PlayerLives").GetComponent<Text>().text += (player.GetComponent<PlayerMovement>().color) + " health: " +
 (player.GetComponent<PlayerMovement>().Health) + "\n";
                     }
                     black.SetActive(false);
@@ -244,11 +274,12 @@ public class GameManager : MonoBehaviour
                     timer = 5;
                 }
 
-                if (!audio.isPlaying && audio.clip != scream1)
+                if (!audio.isPlaying && audio.clip != scream1 && playScream)
                 {
                     audio.clip = scream1;
                     audio.volume = 0.5f;
                     audio.Play();
+                    playScream = false;
                 }
 
                 break;
@@ -261,8 +292,7 @@ public class GameManager : MonoBehaviour
                     foreach (GameObject player in players)
                     {
                         if (player.GetComponent<PlayerMovement>().Health <= 0)
-                        {
-
+                        {           
                             killThis.Add(player);
                         }
                     }
@@ -275,8 +305,8 @@ public class GameManager : MonoBehaviour
                     GameObject.Find("PlayerLives").GetComponent<Text>().text = "";
                     foreach (GameObject player in players)
                     {
-                        GameObject.Find("PlayerLives").GetComponent<Text>().text += "Player " + (player.GetComponent<PlayerMovement>().PlayerNumber) + " health: " +
-                        (player.GetComponent<PlayerMovement>().Health) + "\n";
+                        GameObject.Find("PlayerLives").GetComponent<Text>().text += (player.GetComponent<PlayerMovement>().color) + " health: " +
+(player.GetComponent<PlayerMovement>().Health) + "\n";
                     }
 
                     if (players.Count <= 1)
@@ -298,6 +328,12 @@ public class GameManager : MonoBehaviour
                     player.GetComponent<PlayerMovement>().Reset();
                 }
                 monsterCountTemp = monsterCount;
+                
+                while (leftovers.Count > 0)
+                {
+                    Destroy(leftovers[0]);
+                    leftovers.Remove(leftovers[0]);
+                }
 
                 foreach (GameObject bed in GetComponent<Shuffle>().Bedplacements)
                 {
@@ -308,6 +344,9 @@ public class GameManager : MonoBehaviour
                 {
                     monsters.Add(Instantiate(Monster, new Vector3(0, 0, -4), Quaternion.identity));
                 }
+
+
+
                 hasPlayed = false;
                 monsterPlaced = 0;
                 round++;
@@ -326,7 +365,7 @@ public class GameManager : MonoBehaviour
                 {
                     
 
-                    tempString = winButtonText.text.Split('$')[0] + " " + players[0].tag.ToString()+ " " + winButtonText.text.Split('$')[1];
+                    tempString = winButtonText.text.Split('$')[0] + " " + players[0].GetComponent<PlayerMovement>().color + " " + winButtonText.text.Split('$')[1];
                     winButtonText.text = tempString;
 
                     tempString = winButton2Text.text.Split('$')[0] + " " + round + " " + winButton2Text.text.Split('$')[1];

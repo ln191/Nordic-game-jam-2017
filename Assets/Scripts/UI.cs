@@ -12,8 +12,8 @@ public class UI : MonoBehaviour
     {
         for (int i = 1; i < GameObject.Find("MenuScript").GetComponent<MenuScript>().Players + 1; i++)
         {
-            GetComponent<Text>().text += "Player " + (GameObject.FindGameObjectWithTag("Player" + i).GetComponent<PlayerMovement>().PlayerNumber) + " health: " +
-                 (GameObject.FindGameObjectWithTag("Player" + i).GetComponent<PlayerMovement>().Health) + "\n";
+            GetComponent<Text>().text += (GameObject.FindGameObjectWithTag("Player" + i).GetComponent<PlayerMovement>().color) + " health: " +
+ (GameObject.FindGameObjectWithTag("Player" + i).GetComponent<PlayerMovement>().Health) + "\n";
         }
     }
 

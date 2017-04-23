@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     private GameObject bed;
     private AudioSource audio;
     private Animator animator;
+    public string color;
 
     [SerializeField]
     public AudioClip Scream;
@@ -223,28 +224,34 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.tag == "Bed")
         {
-            if (!InBed && !keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1 && allowMovement)
+            if (!InBed && !keyDown && !other.GetComponent<Bed>().isOccupied && Input.GetAxis("Fire" + playerNumber) == 1)
             {
-                inBed = true;
+                if (allowMovement)
+                {
+                    if (Random.Range(1, 10f) < 5)
+                    {
+                        audio.clip = Sleep1;
+                    }
+                    else
+                    {
+                        audio.clip = Sleep2;
+                    }
 
-                animator.SetBool("walking", false);
-                transform.position = (new Vector3(other.gameObject.transform.position.x, 1.5f, other.gameObject.transform.position.z));
-                transform.rotation = Quaternion.Euler(new Vector3(90, other.transform.rotation.y + 90, 90));
+                    audio.volume = (0.5f);
+                    audio.Play();
+
+                    inBed = true;
+
+                    animator.SetBool("walking", false);
+                    transform.position = (new Vector3(other.gameObject.transform.position.x, 1, other.gameObject.transform.position.z));
+                    transform.rotation = Quaternion.Euler(new Vector3(90, other.transform.rotation.y + 90, 90));
+
+                }
                 other.GetComponent<Bed>().isOccupied = true;
                 keyDown = true;
                 bed = other.gameObject;
 
-                if (Random.Range(1, 10f) < 5)
-                {
-                    audio.clip = Sleep1;
-                }
-                else
-                {
-                    audio.clip = Sleep2;
-                }
 
-                audio.volume = (0.5f);
-                audio.Play();
             }
 
             //Debug.Log("Bed test");   
@@ -253,7 +260,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 other.GetComponent<Bed>().isOccupied = false;
                 inBed = false;
-                transform.position = (new Vector3(other.gameObject.transform.position.x, 0.7f, other.gameObject.transform.position.z - 2));
+                transform.position = (new Vector3(other.gameObject.transform.position.x, 1f, other.gameObject.transform.position.z - 2));
                 transform.rotation = Quaternion.Euler(new Vector3(0, other.transform.rotation.y, 0));
                 keyDown = true;
             }
@@ -270,5 +277,6 @@ public class PlayerMovement : MonoBehaviour
         inBed = false;
         allowMovement = false;
         animator.SetBool("walking", false);
+        transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
     }
 }
